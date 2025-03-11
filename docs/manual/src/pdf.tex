@@ -1,0 +1,24 @@
+\documentclass[usletter]{article}
+\usepackage{DejaVuSans}
+\renewcommand*\familydefault{\sfdefault}
+\usepackage[T1]{fontenc}
+\usepackage{graphicx}
+\usepackage{listings}
+\lstset{
+  breaklines=true,
+  postbreak=\mbox{\textcolor{red}{$\hookrightarrow$}\space},
+}
+\usepackage{pdfpages}
+\usepackage[hidelinks]{hyperref}
+\begin{document}
+
+  \include{src/common.tex}
+
+  %module documentation section
+
+  \includepdf[pages=-, addtotoc={1,subsection,1,init,p1}, pagecommand={}]{files___init__-py.pdf}
+  \includepdf[pages=-, addtotoc={1,subsection,1,mil-std-1553,p1}, pagecommand={}]{files_mil_std_1553-py.pdf}
+  \includepdf[pages=-, addtotoc={1,subsection,1,test mil-std-1553 python,p1}, pagecommand={}]{files2_test_mil_std_1553-py.pdf}
+  \includepdf[pages=-, addtotoc={1,subsection,1,test mil-std-1553 verilog,p1}, pagecommand={}]{files2_test_mil_std_1553-v.pdf}
+
+\end{document}
