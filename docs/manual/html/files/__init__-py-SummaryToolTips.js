@@ -1,0 +1,1 @@
+﻿NDSummary.OnToolTipsLoaded("File:__init__.py",{98:"<div class=\"NDToolTip TInformation LPython\"><div class=\"TTSummary\">MIL-STD-1553 define for packages license: License MIT Copyright 2025 Jay Convertino</div></div>"});
