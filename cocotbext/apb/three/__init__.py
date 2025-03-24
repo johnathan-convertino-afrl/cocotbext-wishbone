@@ -6,7 +6,8 @@
 # date:    2025/03/06
 #
 # about:   Brief
-# MIL-STD-1553 define for packages
+# apb define for packages
+#
 # license: License MIT
 # Copyright 2025 Jay Convertino
 #
