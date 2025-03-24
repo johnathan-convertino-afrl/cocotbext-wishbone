@@ -26,35 +26,20 @@ WAVES ?= 0
 COCOTB_HDL_TIMEUNIT = 1ns
 COCOTB_HDL_TIMEPRECISION = 1ns
 
-DUT      = test_axi
+DUT      = test
 TOPLEVEL = $(DUT)
 MODULE   = $(DUT)
 VERILOG_SOURCES += $(DUT).v
 
-# module parameters
-export PARAM_DATA_WIDTH := 32
-export PARAM_ADDR_WIDTH := 32
-export PARAM_STRB_WIDTH := $(shell expr $(PARAM_DATA_WIDTH) / 8 )
-export PARAM_ID_WIDTH := 8
-export PARAM_AWUSER_WIDTH := 1
-export PARAM_WUSER_WIDTH := 1
-export PARAM_BUSER_WIDTH := 1
-export PARAM_ARUSER_WIDTH := 1
-export PARAM_RUSER_WIDTH := 1
-
 ifeq ($(SIM), icarus)
 	PLUSARGS += -fst
-
-	COMPILE_ARGS += $(foreach v,$(filter PARAM_%,$(.VARIABLES)),-P $(TOPLEVEL).$(subst PARAM_,,$(v))=$($(v)))
 
 	ifeq ($(WAVES), 1)
 		VERILOG_SOURCES += iverilog_dump.v
 		COMPILE_ARGS += -s iverilog_dump
 	endif
 else ifeq ($(SIM), verilator)
-	COMPILE_ARGS += -Wno-SELRANGE -Wno-WIDTH -Wno-CASEINCOMPLETE
-
-	COMPILE_ARGS += $(foreach v,$(filter PARAM_%,$(.VARIABLES)),-G$(subst PARAM_,,$(v))=$($(v)))
+	COMPILE_ARGS += -Wno-SELRANGE -Wno-WIDTH
 
 	ifeq ($(WAVES), 1)
 		COMPILE_ARGS += --trace-fst

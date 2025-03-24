@@ -1,7 +1,7 @@
 \begin{titlepage}
   \begin{center}
 
-  {\Huge cocotbext mil-std-1553}
+  {\Huge cocotbext APB}
 
   \vspace{25mm}
 
@@ -27,7 +27,7 @@
 \subsection{Introduction}
 
 \par
-Cocotb extension to test mil-std-1553 transmit and receive.
+Cocotb extension to test APB3 bus master, and slave devices.
 
 \subsection{Dependencies}
 
@@ -37,28 +37,23 @@ The following are the dependencies of the cores.
 \begin{itemize}
   \item iverilog (simulation)
   \item cocotb (simulation)
-  \item machester (python)
+  \item cocotb-bus (simulation)
 \end{itemize}
 
 \subsection{In a Simulation}
 \par
-Below is a simple example for reading and writing data over mil-std-1553 in the cocotb extension.
+Below is a simple example for reading and writing data from register zero in the cocotb extension.
 \begin{lstlisting}[language=Python]
-source  = MILSTD1553Source(dut.data)
 
-sink = MILSTD1553Sink(dut.data)
+master  = apb3Master(dut, "apb", dut.clk, dut.rstn)
+slave = apb3EchoSlave(dut, "apb", dut.clk, dut.rstn)
 
-test_data = 128
+await master.write(0, 0xAAAAAAAA)
 
-data = test_data.to_bytes(2, byteorder="little")
+rx_data = await master.read(0)
 
-await source.write_cmd(data)
+assert 0xAAAAAAAA == rx_data, "RECEIVED DATA DOES NOT MATCH"
 
-await source.write_data(data)
-
-rx_data = await sink.read_cmd()
-
-rx_data = await sink.read_data()
 \end{lstlisting}
 
 \section{Architecture}
@@ -66,13 +61,12 @@ rx_data = await sink.read_data()
 Please see \ref{Code Documentation} for more information.
 
 \par
-MILSTD1553Source tests mil-std-1553 receive devices. This is uses the machester encoder library in python, then this is bit banged out using timers.
-The sync is sent based upon which write command is used. write\_cmd will write the data and use a command sync out. write\_data will write the data and
-use a data sync out.
+apb3Master tests APB3 slave devices by executing read/write requests from the python test bench.
 \par
-MILSTD1553Sink tests mil-std-1553 transmit devices. This is uses the machester decoder library in python, then this is bit banged in using timers. Once a
-sync is identified the data is put in one of two queues. The data queue contains data that came from a message that started with a data sync. The command
-queue contains data that came from a message that started with a command/status sync.
+apb3EchoSlave provides a simple slave that will echo all register writes back over read when requested.
+\par
+apb3Monitor tests to make sure signals are proper. Simple core at the moment, only checks for 0 at rest
+and if the penable is correct per pselect.
 
 \subsection{Directory Guide}
 
@@ -85,6 +79,9 @@ Below highlights important folders from the root of the directory.
       \item \textbf{manual} Contains user manual and github page that are generated from the latex sources.
     \end{itemize}
   \item \textbf{cocotbext} Contains source files for the extension
+    \begin{itemize}
+      \item \textbf{apb.three} Contains source files for the APB version three extension.
+    \end{itemize}
   \item \textbf{tests} Contains test files for cocotb
 \end{enumerate}
 
@@ -116,9 +113,12 @@ which will kick off the test.
 Natural docs is used to generate documentation for this project. The next lists the following sections.
 
 \begin{itemize}
-\item \textbf{init} python init code\\
-\item \textbf{mil-std-1553} cocotb extension library.\\
-\item \textbf{test mil-std-1553 verilog} Verilog test bench for cocotb.\\
-\item \textbf{test mil-std-1553 python} cocotb unit test functions.\\
+  \item \textbf{init} Python init code.\\
+  \item \textbf{monitor} Contains bus monitor code.\\
+  \item \textbf{driver} Contains bus driver code.\\
+  \item \textbf{absbus} Contains bus abstraction for monitor, and driver code.\\
+  \item \textbf{busbase} Contains bus base for threads and read/write methods.\\
+  \item \textbf{cocotb test} Python TestFactory code.\\
+  \item \textbf{cocotb verilog test wrapper} Verilog wrapper module.\\
 \end{itemize}
 

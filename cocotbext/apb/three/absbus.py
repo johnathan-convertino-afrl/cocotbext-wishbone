@@ -1,12 +1,12 @@
 #******************************************************************************
-# file:    __init__.py
+# file:    absbus.py
 #
 # author:  JAY CONVERTINO
 #
 # date:    2025/03/11
 #
 # about:   Brief
-# wishbone classic bus define for packages
+# abstraction of the apb3 bus
 #
 # license: License MIT
 # Copyright 2025 Jay Convertino
@@ -31,8 +31,43 @@
 #
 #******************************************************************************
 
-from .version import __version__
+import cocotb
 
-#from  import ,
-from .wishbone_classic import *
-from .wishbone_pipeline import *
+from ..busbase import *
+
+import enum
+
+# Class: apb3trans
+# create an object that associates a data member and address for operation.
+class apb3trans(transaction):
+    def __init__(self, address, data=None):
+        self.address = address
+        self.data = data
+
+# Class: apbState
+# An enum class that provides the current state and will change states per spec.
+class apbState(enum.IntEnum):
+  IDLE = 1
+  SETUP = 2
+  ACCESS = 3
+  ERROR = 99
+
+# Class: apb3Base
+# abstract base class that defines apb3 signals
+class apb3Base(busbase):
+  # Variable: _signals
+  # List of signals that are required
+  _signals = ["paddr", "psel", "penable", "pwrite", "pwdata", "pready", "prdata"]
+  # Variable: _optional_signals
+  # List of optional signals, these will never be required but will be used if found.
+  _optional_signals = ["pslverr"]
+
+  # Constructor: __init__
+  # Setup defaults and call base class constructor.
+  def __init__(self, entity, name, clock, resetn, *args, **kwargs):
+
+    super().__init__(entity, name, clock, *args, **kwargs)
+
+    self._apbStateMachine = apbState.IDLE
+
+    self._resetn = resetn

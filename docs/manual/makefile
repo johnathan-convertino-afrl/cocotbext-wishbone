@@ -1,4 +1,4 @@
-PROJECT_NAME := cocotbext_wishbone
+PROJECT_NAME := cocotbext_apb
 
 MK_DIR := makefiles
 
