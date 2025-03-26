@@ -82,7 +82,7 @@ class apb3Master(apb3Base):
         self.log.error(f'Address and data vector must be the same length')
       temp = []
       for i in range(len(address)):
-        temp.append(address[i], data[i])
+        temp.append(apb3trans(address[i], data[i]))
       await self.write_trans(temp)
     else:
       await self.write_trans(apb3trans(address, data))
@@ -131,6 +131,8 @@ class apb3Master(apb3Base):
             self._apbStateMachine = apbState.SETUP
           elif(self._apbStateMachine == apbState.SETUP):
             self.bus.penable.value = 1
+            self.bus.paddr.value = trans.address
+            self.bus.pwdata.value = trans.data
             self._apbStateMachine = apbState.ACCESS
           elif(self._apbStateMachine == apbState.ACCESS):
             # no longer idle as we have nothing else to write
