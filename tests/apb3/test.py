@@ -67,10 +67,13 @@ from cocotb.clock import Clock
 from cocotb.triggers import Timer, RisingEdge, NextTimeStep
 from cocotb.regression import TestFactory
 
-import sys
-sys.path.append("../../")
 
-from cocotbext.apb.three import apb3Master, apb3EchoSlave, apb3Monitor
+try:
+    from cocotbext.apb.three import apb3Master, apb3EchoSlave, apb3Monitor
+except ImportError as e:
+    import sys
+    sys.path.append("../../")
+    from cocotbext.apb.three import apb3Master, apb3EchoSlave, apb3Monitor
 
 # Class: TB
 # Create the device under test which is the master/slave.
