@@ -129,9 +129,9 @@ class busbase:
         return self.wqueue.empty()
 
     # Function: read_empty
-    # Is the quene empty?self.bus.penable.value
+    # Is the quene empty?
     def read_empty(self):
-        return self.rqueue.empty()
+        return self.rqueue.empty() and self.qqueue.empty()
 
     # Function: write_clear
     # Remove all write items from queue

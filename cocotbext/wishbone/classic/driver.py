@@ -37,7 +37,7 @@ from .absbus import *
 from cocotb.triggers import FallingEdge, RisingEdge, Event
 from cocotb.result import TestFailure
 from cocotb.binary import BinaryValue
-from cocotb.queue import Queue
+from cocotb.queue import Queue                                         s_wb_err,
 
 # Class: wishboneClassicMaster
 # Drive slave devices over the Wishbone Classic bus
@@ -52,11 +52,18 @@ class wishboneClassicMaster(wishboneClassicBase):
     self.log.info("https://github.com/johnathan-convertino-afrl/cocotbext-wishbone")
 
     # setup bus to default value imediatly
-    self.bus.paddr.setimmediatevalue(0)
-    self.bus.psel.setimmediatevalue(0)
-    self.bus.penable.setimmediatevalue(0)
-    self.bus.pwrite.setimmediatevalue(0)
-    self.bus.pwdata.setimmediatevalue(0)
+    if self._cti.value != False:
+      self._cti.setimmediatevalue(0)
+
+    if self._bte.value != False:
+      self._bte.setimmediatevalue(0)
+
+    self.bus.sel.setimmediatevalue(0)
+    self.bus.data_i.setimmediatevalue(0)
+    self.bus.addr.setimmediatevalue(0)
+    self.bus.we.setimmediatevalue(0)
+    self.bus.stb.setimmediatevalue(0)
+    self.bus.cyc.setimmediatevalue(0)
 
   # Function: read
   # Read from a address and return data
@@ -65,12 +72,12 @@ class wishboneClassicMaster(wishboneClassicBase):
     if(isinstance(address, list)):
       temp = []
       for a in address:
-        temp.append(apb3trans(a))
+        temp.append(wishboneClassicTrans(a))
       temp = await self.read_trans(temp)
       #need a return with the data list only. This is only a guess at this point
       return [temp[i].data for i in range(len(temp))]
     else:
-      trans = await self.read_trans(apb3trans(address))
+      trans = await self.read_trans(wishboneClassicTrans(address))
       return trans.data
 
   # Function: write
@@ -81,16 +88,16 @@ class wishboneClassicMaster(wishboneClassicBase):
         self.log.error(f'Address and data vector must be the same length')
       temp = []
       for i in range(len(address)):
-        temp.append(apb3trans(address[i], data[i]))
+        temp.append(wishboneClassicTrans(address[i], data[i]))
       await self.write_trans(temp)
     else:
-      await self.write_trans(apb3trans(address, data))
+      await self.write_trans(wishboneClassicTrans(address, data))
 
   # Function: _check_type
   # Check and make sure we are only sending 2 bytes at a time and that it is a bytes/bytearray
   def _check_type(self, trans):
-      if(not isinstance(trans, apb3trans)):
-          self.log.error(f'Transaction must be of type: {type(apb3trans)}')
+      if(not isinstance(trans, wishboneClassicTrans)):
+          self.log.error(f'Transaction must be of type: {type(wishboneClassicTrans)}')
           return False
 
       return True
@@ -115,93 +122,9 @@ class wishboneClassicMaster(wishboneClassicBase):
         self._idle.set()
         continue
 
-      # write queue is not empty, we need to write that data.
-      if not self.wqueue.empty():
-        self.active = True
-        #keep in active loop
-        while self.active:
-          self.log.info(f'APB3 MASTER STATE: {self._apbStateMachine.name} BUS WRITE')
-          if(self._apbStateMachine == apbState.IDLE):
-            trans = await self.wqueue.get()
-            self.bus.psel.value = 1
-            self.bus.paddr.value = trans.address
-            self.bus.pwdata.value = trans.data
-            self.bus.pwrite.value = 1
-            self._apbStateMachine = apbState.SETUP
-          elif(self._apbStateMachine == apbState.SETUP):
-            self.bus.penable.value = 1
-            self.bus.paddr.value = trans.address
-            self.bus.pwdata.value = trans.data
-            self._apbStateMachine = apbState.ACCESS
-          elif(self._apbStateMachine == apbState.ACCESS):
-            # no longer idle as we have nothing else to write
-            if(self.wqueue.empty() and self.bus.pready.value):
-              self.bus.psel.value = 0
-              self.bus.penable.value = 0
-              self._apbStateMachine = apbState.IDLE
-              self.active = False
-              self._idle.set()
-            # still active, but we do have a second to idle
-            elif(self.bus.pready.value):
-              trans = await self.wqueue.get()
-              self.bus.penable.value = 0
-              self._apbStateMachine = apbState.SETUP
-              self._idle.set()
-
-          #all operations are done on rising edge of clock
-          await RisingEdge(self.clock)
-
-      # request queue is not empty, do a read.
-      elif not self.qqueue.empty():
-        self.active = True
-        #keep in active loop
-        while self.active:
-          self.log.info(f'APB3 MASTER STATE: {self._apbStateMachine.name} BUS READ')
-          if(self._apbStateMachine == apbState.IDLE):
-            trans = await self.qqueue.get()
-            self.bus.psel.value = 1
-            self.bus.paddr.value = trans.address
-            self.bus.pwrite.value = 0
-            self._apbStateMachine = apbState.SETUP
-          elif(self._apbStateMachine == apbState.SETUP):
-            self.bus.penable.value = 1
-            self._apbStateMachine = apbState.ACCESS
-          elif(self._apbStateMachine == apbState.ACCESS):
-            # queue is empty and we are ready, time to go to idle.
-            if(self.qqueue.empty() and self.bus.pready.value):
-              trans.data = self.bus.prdata.value
-              await self.rqueue.put(trans)
-              self.bus.psel.value = 0
-              self.bus.penable.value = 0
-              self._apbStateMachine = apbState.IDLE
-              self.active = False
-              self._idle.set()
-            # ready and not empty, lets idle the active thread.
-            elif(self.bus.pready.value):
-              trans = await self.qqueue.get()
-              self.bus.penable.value = 0
-              self.bus.paddr.value = trans.address
-              trans.data = self.bus.prdata.value
-              await self.rqueue.put(trans)
-              self._apbStateMachine = apbState.SETUP
-              self._idle.set()
-
-          # all operations happen on positive edge
-          await RisingEdge(self.clock)
-
-      else:
-        # nothing in the queues, idle and set all values to zero
-        self._idle.set()
-
-        self.bus.psel.value = 0
-        self.bus.paddr.value = 0
-        self.bus.penable.value = 0
-        self.bus.pwrite.value = 0
-        self.bus.pwdata.value = 0
-
 # Class: wishboneClassicEchoSlave
 # Respond to master reads and write by returning data, simple echo core.
-class wishboneClassicSlave(wishboneClassicBase):
+class wishboneClassicEchoSlave(wishboneClassicBase):
   # Constructor: __init__
   # Setup defaults and call base class constructor.
   def __init__(self, entity, name, clock, reset, numreg=256, *args, **kwargs):
@@ -220,11 +143,19 @@ class wishboneClassicSlave(wishboneClassicBase):
     for i in range(numreg):
       self._registers[i] = 0
 
+  # Function: _next_address
+  # Function to generate next address based on cycle type
+  def _next_address(self, trans):
+    # what type of cycle
+    # what type of burst
+    # if its something different then we need to do a end-of-burst and hold off
+    return True # :) address in the future
+
   # Function: _check_type
-  # Check and make sure we are only sending a type of apb3trans.
+  # Check and make sure we are only sending a type of wishboneClassicTrans.
   def _check_type(self, trans):
-      if(not isinstance(trans, apb3trans)):
-          self.log.error(f'Transaction must be of type: {type(apb3trans)}')
+      if(not isinstance(trans, wishboneClassicTrans)):
+          self.log.error(f'Transaction must be of type: {type(wishboneClassicTrans)}')
           return False
 
       return True
@@ -236,49 +167,3 @@ class wishboneClassicSlave(wishboneClassicBase):
 
     while True:
       await RisingEdge(self.clock)
-
-      if self.bus.psel.value and self._resetn:
-        self.active = True
-        while self.active:
-          self.log.info(f'APB3 SLAVE STATE: {self._apbStateMachine.name}')
-
-          if(self._apbStateMachine == apbState.IDLE):
-            self.bus.pslverr.value = 0
-            self.bus.pready.value = 0
-            if(self.bus.psel.value):
-              self._apbStateMachine = apbState.SETUP
-          elif(self._apbStateMachine == apbState.SETUP):
-            if(self.bus.psel.value and self.bus.penable.value):
-              self.bus.pready.value = 1
-              if self.bus.pwrite.value:
-                self._registers[self.bus.paddr.value.integer] = self.bus.pwdata.value
-              else:
-                self.bus.prdata.value = self._registers[self.bus.paddr.value.integer]
-              self._apbStateMachine = apbState.ACCESS
-            else:
-              self._apbStateMachine = apbState.IDLE
-              self.bus.pready.value = 0
-              self.active = False
-              self._idle.set()
-          elif(self._apbStateMachine == apbState.ACCESS):
-            if(self.bus.psel.value and self.bus.penable.value):
-              self.bus.pready.value = 0
-              self._apbStateMachine = apbState.SETUP
-              self.bus.prdata.value = 0
-              self._idle.set()
-            else:
-              self._apbStateMachine = apbState.IDLE
-              self.bus.pready.value = 0
-              self.bus.prdata.value = 0
-              self.active = False
-              self._idle.set()
-
-          await RisingEdge(self.clock)
-      else:
-        self._idle.set()
-
-        self._apbStateMachine = apbState.IDLE
-
-        self.bus.pready.value = 0
-        self.bus.prdata.value = 0
-        self.bus.pslverr.value = 0

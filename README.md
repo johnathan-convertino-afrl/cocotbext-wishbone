@@ -1,5 +1,5 @@
 # Cocotbext for Wishbone Classic Bus
-### Provides monitor and driver.
+### Provides monitor and driver for Wishbone B4 versions.
 
 ![image](docs/manual/img/AFRL.png)
 
@@ -27,6 +27,11 @@
 
   - [cocotbext_wishbone.pdf](docs/manual/cocotbext_wishbone.pdf)
   - [github page](https://johnathan-convertino-afrl.github.io/cocotbext-wishbone/)
+
+  Naming of the wishbone bus is as follows:
+
+  - Wishbone Classic Standard = Wishbone Classic
+  - Wishbone Classic Pipelined = Wishbone Pipelined
 
 ### DEPENDENCIES
 #### Build
