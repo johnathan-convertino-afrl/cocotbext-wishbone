@@ -1,1 +1,0 @@
-﻿NDSummary.OnToolTipsLoaded("PythonClass:apbState",{59:"<div class=\"NDToolTip TClass LPython\"><div class=\"NDClassPrototype\" id=\"NDClassPrototype59\"><div class=\"CPEntry TClass Current\"><div class=\"CPName\">apbState</div></div></div><div class=\"TTSummary\">An enum class that provides the current state and will change states per spec.</div></div>"});

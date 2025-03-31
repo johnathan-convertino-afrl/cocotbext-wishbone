@@ -1,4 +1,4 @@
-# Cocotbext for APB Bus
+# Cocotbext for Wishbone Classic Bus
 ### Provides monitor and driver.
 
 ![image](docs/manual/img/AFRL.png)
@@ -7,7 +7,7 @@
 
    author: Jay Convertino   
    
-   date: 2025.03.24
+   date: 2025.03.31
    
    details:
    
@@ -25,8 +25,8 @@
 ### DOCUMENTATION
   For detailed usage information, please navigate to one of the following sources. They are the same, just in a different format.
 
-  - [cocotbext_apb.pdf](docs/manual/cocotbext_apb.pdf)
-  - [github page](https://johnathan-convertino-afrl.github.io/cocotbext-apb/)
+  - [cocotbext_wishbone.pdf](docs/manual/cocotbext_wishbone.pdf)
+  - [github page](https://johnathan-convertino-afrl.github.io/cocotbext-wishbone/)
 
 ### DEPENDENCIES
 #### Build
@@ -40,9 +40,9 @@
 
 ```bash
 ├── cocotbext
-│   └── apb
+│   └── wishbone
 │       ├── busbase.py
-│       ├── three
+│       ├── classic
 │       │   ├── absbus.py
 │       │   ├── driver.py
 │       │   ├── __init__.py
@@ -51,7 +51,7 @@
 ├── docs
 │   ├── index.html
 │   └── manual
-│       ├── cocotbext-apb.html
+│       ├── cocotbext-wishbone.html
 │       ├── config
 │       │   ├── Comments.txt
 │       │   ├── Languages.txt
@@ -91,7 +91,7 @@
 ├── setup.cfg
 ├── setup.py
 └── tests
-    └── apb3
+    └── wishbone_classic
         ├── Makefile
         ├── test.py
         └── test.v
