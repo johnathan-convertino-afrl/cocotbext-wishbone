@@ -36,41 +36,43 @@
 /*
  * Module: test
  *
- * Test bench loop for apb
+ * Test of Wishbone Classic
  *
  * Parameters:
  *
- *   ADDRESS_WIDTH   - Width of the APB3 address port in bits.
- *   BUS_WIDTH       - Width of the APB3 bus data port in bytes.
+ *   ADDRESS_WIDTH   - Width of the Wishbone address port in bits.
+ *   BUS_WIDTH       - Width of the Wishbone bus data port in bytes.
  *
  * Ports:
  *
- *   clk            - Clock
- *   rstn           - Negative reset
- *   apb_paddr      - APB3 address bus, up to 32 bits wide.
- *   apb_psel       - APB3 select per slave (1 for this core).
- *   apb_penable    - APB3 enable device for multiple transfers after first.
- *   apb_pready     - APB3 ready is a output from the slave to indicate its able to process the request.
- *   apb_pwrite     - APB3 Direction signal, active high is a write access. Active low is a read access.
- *   apb_pwdata     - APB3 write data port.
- *   apb_prdata     - APB3 read data port.
- *   apb_pslverror  - APB3 error indicates transfer failure, not implimented.
+ *   clk              - Clock
+ *   rst              - Positive reset
+ *   s_wb_cyc         - Bus Cycle in process
+ *   s_wb_stb         - Valid data transfer cycle
+ *   s_wb_we          - Active High write, low read
+ *   s_wb_addr        - Bus address
+ *   s_wb_data_i      - Input data
+ *   s_wb_sel         - Device Select
+ *   s_wb_ack         - Bus transaction terminated
+ *   s_wb_data_o      - Output data
+ *   s_wb_err         - Active high when a bus error is present
  */
 module test #(
-    parameter ADDRESS_WIDTH = 32,
-    parameter BUS_WIDTH = 4
+    parameter ADDRESS_WIDTH = 16,
+    parameter BUS_WIDTH     = 4
   )
   (
-    input                       clk,
-    input                       rstn,
-    inout [ADDRESS_WIDTH-1:0]   apb_paddr,
-    inout                       apb_psel,
-    inout                       apb_penable,
-    inout                       apb_pwrite,
-    inout [BUS_WIDTH*8-1:0]     apb_pwdata,
-    inout                       apb_pready,
-    inout [BUS_WIDTH*8-1:0]     apb_prdata,
-    inout                       apb_pslverr
+    input                                           clk,
+    input                                           rst,
+    inout                                           s_wb_cyc,
+    inout                                           s_wb_stb,
+    inout                                           s_wb_we,
+    inout   [ADDRESS_WIDTH-1:0]                     s_wb_addr,
+    inout   [BUS_WIDTH*8-1:0]                       s_wb_data_i,
+    inout   [BUS_WIDTH-1:0]                         s_wb_sel,
+    inout                                           s_wb_ack,
+    inout   [BUS_WIDTH*8-1:0]                       s_wb_data_o,
+    inout                                           s_wb_err
   );
 
   //copy pasta, fst generation

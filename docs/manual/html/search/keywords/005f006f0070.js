@@ -1,0 +1,1 @@
+﻿NDSearch.OnPrefixDataLoaded("_op",["Variable"],[["_optional_signals",,[["wishboneClassicBase",,,,0,"File:absbus.py:wishboneClassicBase._optional_signals","PythonClass:wishboneClassicBase:_optional_signals"]]]]);

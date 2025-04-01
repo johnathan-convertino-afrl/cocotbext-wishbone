@@ -1,0 +1,1 @@
+﻿NDContentPage.OnToolTipsLoaded({93:"<div class=\"NDToolTip TClass LPython\"><div class=\"NDClassPrototype\" id=\"NDClassPrototype93\"><div class=\"CPEntry TClass Current\"><div class=\"CPName\">wishboneClassicBase</div></div></div><div class=\"TTSummary\">abstract base class that defines Wishbone Classic signals</div></div>"});

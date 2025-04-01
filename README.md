@@ -1,4 +1,4 @@
-# Cocotbext for Wishbone Classic Bus
+# Cocotbext for Wishbone Bus
 ### Provides monitor and driver for Wishbone B4 versions.
 
 ![image](docs/manual/img/AFRL.png)
@@ -30,8 +30,11 @@
 
   Naming of the wishbone bus is as follows:
 
-  - Wishbone Classic Standard = Wishbone Classic
+  - Wishbone Classic Standard = Wishbone Classic without out CTI/BTE
+  - Wishbone Classic Registered = Wishbone Classic Registered with CTI/BTE
   - Wishbone Classic Pipelined = Wishbone Pipelined
+
+  Only Wishbone Classic Standard is done at the moment, and honestly will be the only one since I'm not a huge fan of Wishbone as a bus.
 
 ### DEPENDENCIES
 #### Build

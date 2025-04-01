@@ -27,7 +27,8 @@
 \subsection{Introduction}
 
 \par
-Cocotb extension to test APB3 bus master, and slave devices.
+Cocotb extension to test Wishbone Classic Standard bus master, and slave devices.
+This currently only tests for devices that are not pipelined or using cti/bte. Also no tags.
 
 \subsection{Dependencies}
 
@@ -45,8 +46,8 @@ The following are the dependencies of the cores.
 Below is a simple example for reading and writing data from register zero in the cocotb extension.
 \begin{lstlisting}[language=Python]
 
-master  = apb3Master(dut, "apb", dut.clk, dut.rstn)
-slave = apb3EchoSlave(dut, "apb", dut.clk, dut.rstn)
+master  = wishboneClassicMaster(dut, "s_wb", dut.clk, dut.rst)
+slave = wishboneClassicEchoSlave(dut, "s_wb", dut.clk, dut.rst)
 
 await master.write(0, 0xAAAAAAAA)
 
@@ -61,12 +62,12 @@ assert 0xAAAAAAAA == rx_data, "RECEIVED DATA DOES NOT MATCH"
 Please see \ref{Code Documentation} for more information.
 
 \par
-apb3Master tests APB3 slave devices by executing read/write requests from the python test bench.
+wishboneClassicMaster tests Wishbone Classic slave devices by executing read/write requests from the python test bench.
 \par
-apb3EchoSlave provides a simple slave that will echo all register writes back over read when requested.
+wishboneClassicEchoSlave provides a simple slave that will echo all register writes back over read when requested.
 \par
-apb3Monitor tests to make sure signals are proper. Simple core at the moment, only checks for 0 at rest
-and if the penable is correct per pselect.
+wishboneClassicMonitor tests to make sure signals are proper. Simple core at the moment, only checks for if stb is
+asserted when cyc is not.
 
 \subsection{Directory Guide}
 
@@ -80,7 +81,7 @@ Below highlights important folders from the root of the directory.
     \end{itemize}
   \item \textbf{cocotbext} Contains source files for the extension
     \begin{itemize}
-      \item \textbf{apb.three} Contains source files for the APB version three extension.
+      \item \textbf{wishbone.classic} Contains source files for the Wishbone version B4 classic extension.
     \end{itemize}
   \item \textbf{tests} Contains test files for cocotb
 \end{enumerate}

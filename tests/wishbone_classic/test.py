@@ -69,11 +69,11 @@ from cocotb.regression import TestFactory
 
 
 try:
-    from cocotbext.apb.three import apb3Master, apb3EchoSlave, apb3Monitor
+    from cocotbext.wishbone.classic import wishboneClassicMaster, wishboneClassicEchoSlave, wishboneClassicMonitor
 except ImportError as e:
     import sys
     sys.path.append("../../")
-    from cocotbext.apb.three import apb3Master, apb3EchoSlave, apb3Monitor
+    from cocotbext.wishbone.classic import wishboneClassicMaster, wishboneClassicEchoSlave, wishboneClassicMonitor
 
 # Class: TB
 # Create the device under test which is the master/slave.
@@ -86,14 +86,14 @@ class TB:
 
         cocotb.start_soon(Clock(dut.clk, 2, units="ns").start())
 
-        self.master  = apb3Master(dut, "apb", dut.clk, dut.rstn)
-        self.slave = apb3EchoSlave(dut, "apb", dut.clk, dut.rstn)
-        self.monitor = apb3Monitor(dut, "apb", dut.clk, dut.rstn)
+        self.master  = wishboneClassicMaster(dut, "s_wb", dut.clk, dut.rst)
+        self.slave = wishboneClassicEchoSlave(dut, "s_wb", dut.clk, dut.rst)
+        self.monitor = wishboneClassicMonitor(dut, "s_wb", dut.clk, dut.rst)
 
     async def reset(self):
-        self.dut.rstn.setimmediatevalue(0)
+        self.dut.rst.setimmediatevalue(1)
         await Timer(5, units="ns")
-        self.dut.rstn.value = 1
+        self.dut.rst.value = 0
 
 # Function: run_test
 # Tests the source/sink for valid transmission of data.
@@ -102,6 +102,8 @@ async def run_test(dut, payload_data=None):
     tb = TB(dut)
 
     await tb.reset()
+
+    # dut.s_wb_ack.value = 1
 
     for test_data in payload_data():
 
@@ -112,6 +114,7 @@ async def run_test(dut, payload_data=None):
         rx_data = await tb.master.read(test_data)
 
         assert test_data == rx_data, "RECEIVED DATA DOES NOT MATCH"
+
 
 # Function: incrementing_payload
 # Generate a list of ints that increment from 0 to 2^8

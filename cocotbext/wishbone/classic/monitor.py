@@ -54,8 +54,8 @@ class wishboneClassicMonitor(wishboneClassicBase):
   # Function: _check_type
   # Check and make sure we are only sending wishboneClassicTrans, this is only here to satisify the need to have it.
   def _check_type(self, trans):
-      if(not isinstance(trans, apb3trans)):
-          self.log.error(f'Transaction must be of type: {type(apb3trans)}')
+      if(not isinstance(trans, wishboneClassicTrans)):
+          self.log.error(f'Transaction must be of type: {type(wishboneClassicTrans)}')
           return False
 
       return True
@@ -69,21 +69,16 @@ class wishboneClassicMonitor(wishboneClassicBase):
       await RisingEdge(self.clock)
 
       # when in reset, check values and idle.
-      if not self._resetn.value:
-        assert self.bus.psel.value == 0,    "RESET ISSUE: PSEL is not zero."
-        assert self.bus.paddr.value == 0,   "RESET ISSUE: PADDR is not zero."
-        assert self.bus.penable.value == 0, "RESET ISSUE: PENABLE is not zero."
-        assert self.bus.pwrite.value == 0,  "RESET ISSUE: PWRITE is not zero."
-        assert self.bus.pwdata.value == 0,  "RESET ISSUE: PWDATA is not zero."
-        assert self.bus.prdata.value == 0,  "RESET ISSUE: PRDATA is not zero."
-        assert self.bus.pready.value == 0,  "RESET ISSUE: PREADY is not zero."
+      if self._reset.value:
+        assert self.bus.stb.value == 0,   "RESET ISSUE: STB is not zero."
+        assert self.bus.cyc.value == 0,   "RESET ISSUE: CYC is not zero."
+
         self._idle.set()
         continue
 
       # simple check for now.
-      if self.bus.pready.value:
-        if not self.bus.psel.value:
-          if self.bus.penable.value:
-            raise ValueError("PENABLE ISSUE: PENABLE is not zero when PSEL is zero.")
+      if self.bus.stb.value:
+        if not self.bus.cyc.value:
+          raise ValueError("CYC ISSUE: CYC is not zero when STB is one.")
 
 

@@ -1,0 +1,1 @@
+﻿NDFramePage.OnPageTitleLoaded("PythonClass:transaction","transaction");NDSummary.OnSummaryLoaded("PythonClass:transaction",[["Python","Python"]],[["Classes","Class"]],[[35,0,0,"transaction"]]);

@@ -1,0 +1,1 @@
+﻿NDFramePage.OnPageTitleLoaded("PythonClass:wishboneClassicTrans","wishboneClassicTrans");NDSummary.OnSummaryLoaded("PythonClass:wishboneClassicTrans",[["Python","Python"]],[["Classes","Class"]],[[92,0,0,"wishboneClassicTrans"]]);
