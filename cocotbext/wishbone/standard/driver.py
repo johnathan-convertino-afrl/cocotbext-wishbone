@@ -94,8 +94,7 @@ class wishboneStandardMaster(wishboneStandardBase):
           return False
 
       return True
-otbext
-convertinoj@pebbles:~/Projects/PUBLIC/cocotbext-wishbone/cocotbext$  cd /home/convertinoj/Projects/PUBLIC/cocotbext-wishbone/cocotbext/wis
+
   # Method: _run
   # _run thread that deals with read and write queues.
   async def _run(self):
