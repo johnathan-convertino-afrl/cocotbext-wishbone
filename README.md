@@ -30,8 +30,8 @@
 
   Naming of the wishbone bus is as follows:
 
-  - Wishbone Classic Standard = Wishbone Classic without out CTI/BTE
-  - Wishbone Classic Registered = Wishbone Classic Registered with CTI/BTE
+  - Wishbone Classic Standard = Wishbone Standard without out CTI/BTE
+  - Wishbone Classic Registered = Wishbone Registered with CTI/BTE
   - Wishbone Classic Pipelined = Wishbone Pipelined
 
   Only Wishbone Classic Standard is done at the moment, and honestly will be the only one since I'm not a huge fan of Wishbone as a bus.
@@ -50,7 +50,7 @@
 ├── cocotbext
 │   └── wishbone
 │       ├── busbase.py
-│       ├── classic
+│       ├── standard
 │       │   ├── absbus.py
 │       │   ├── driver.py
 │       │   ├── __init__.py
@@ -99,7 +99,7 @@
 ├── setup.cfg
 ├── setup.py
 └── tests
-    └── wishbone_classic
+    └── wishbone_standard
         ├── Makefile
         ├── test.py
         └── test.v

@@ -6,7 +6,7 @@
 # date:    2025/03/11
 #
 # about:   Brief
-# Monitor for Wishbone Classic
+# Monitor for Wishbone Classic Standard
 #
 # license: License MIT
 # Copyright 2025 Jay Convertino
@@ -39,9 +39,9 @@ from cocotb.result import TestFailure
 from cocotb.binary import BinaryValue
 from cocotb.queue import Queue
 
-# Class: wishboneClassicMonitor
+# Class: wishboneStandardMonitor
 # Check signals to make sure they are applied properly.
-class wishboneClassicMonitor(wishboneClassicBase):
+class wishboneStandardMonitor(wishboneStandardBase):
   # Constructor: __init__
   # Setup defaults and call base class constructor.
   def __init__(self, entity, name, clock, resetn, *args, **kwargs):
@@ -52,10 +52,10 @@ class wishboneClassicMonitor(wishboneClassicBase):
     self.log.info("https://github.com/johnathan-convertino-afrl/cocotbext-wishbone")
 
   # Function: _check_type
-  # Check and make sure we are only sending wishboneClassicTrans, this is only here to satisify the need to have it.
+  # Check and make sure we are only sending wishboneStandardTrans, this is only here to satisify the need to have it.
   def _check_type(self, trans):
-      if(not isinstance(trans, wishboneClassicTrans)):
-          self.log.error(f'Transaction must be of type: {type(wishboneClassicTrans)}')
+      if(not isinstance(trans, wishboneStandardTrans)):
+          self.log.error(f'Transaction must be of type: {type(wishboneStandardTrans)}')
           return False
 
       return True

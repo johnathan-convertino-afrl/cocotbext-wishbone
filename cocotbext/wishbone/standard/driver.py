@@ -39,9 +39,9 @@ from cocotb.result import TestFailure
 from cocotb.binary import BinaryValue
 from cocotb.queue import Queue
 
-# Class: wishboneClassicMaster
+# Class: wishboneStandardMaster
 # Drive slave devices over the Wishbone Classic bus
-class wishboneClassicMaster(wishboneClassicBase):
+class wishboneStandardMaster(wishboneStandardBase):
   # Constructor: __init__
   # Setup defaults and call base class constructor.
   def __init__(self, entity, name, clock, reset, *args, **kwargs):
@@ -65,12 +65,12 @@ class wishboneClassicMaster(wishboneClassicBase):
     if(isinstance(address, list)):
       temp = []
       for a in address:
-        temp.append(wishboneClassicTrans(a))
+        temp.append(wishboneStandardTrans(a))
       temp = await self.read_trans(temp)
       #need a return with the data list only. This is only a guess at this point
       return [temp[i].data for i in range(len(temp))]
     else:
-      trans = await self.read_trans(wishboneClassicTrans(address))
+      trans = await self.read_trans(wishboneStandardTrans(address))
       return trans.data
 
   # Function: write
@@ -81,20 +81,21 @@ class wishboneClassicMaster(wishboneClassicBase):
         self.log.error(f'Address and data vector must be the same length')
       temp = []
       for i in range(len(address)):
-        temp.append(wishboneClassicTrans(address[i], data[i]))
+        temp.append(wishboneStandardTrans(address[i], data[i]))
       await self.write_trans(temp)
     else:
-      await self.write_trans(wishboneClassicTrans(address, data))
+      await self.write_trans(wishboneStandardTrans(address, data))
 
   # Function: _check_type
   # Check and make sure we are only sending 2 bytes at a time and that it is a bytes/bytearray
   def _check_type(self, trans):
-      if(not isinstance(trans, wishboneClassicTrans)):
-          self.log.error(f'Transaction must be of type: {type(wishboneClassicTrans)}')
+      if(not isinstance(trans, wishboneStandardTrans)):
+          self.log.error(f'Transaction must be of type: {type(wishboneStandardTrans)}')
           return False
 
       return True
-
+otbext
+convertinoj@pebbles:~/Projects/PUBLIC/cocotbext-wishbone/cocotbext$  cd /home/convertinoj/Projects/PUBLIC/cocotbext-wishbone/cocotbext/wis
   # Method: _run
   # _run thread that deals with read and write queues.
   async def _run(self):
@@ -121,7 +122,7 @@ class wishboneClassicMaster(wishboneClassicBase):
         self.active = True
         #keep in active loop
         while self.active:
-          if(self._state == wishboneClassicState.IDLE):
+          if(self._state == wishboneStandardState.IDLE):
             trans = await self.wqueue.get()
             self.bus.sel.value = ~0
             self.bus.addr.value = trans.address
@@ -130,9 +131,9 @@ class wishboneClassicMaster(wishboneClassicBase):
             self.bus.stb.value = 1
             self.bus.cyc.value = 1
             self._idle.set()
-            self.log.info(f'WISHBONE CLASSIC MASTER STATE: {self._state.name} BUS WRITE')
-            self._state = wishboneClassicState.ACTIVE
-          elif(self._state == wishboneClassicState.ACTIVE):
+            self.log.info(f'WISHBONE STANDARD MASTER STATE: {self._state.name} BUS WRITE')
+            self._state = wishboneStandardState.ACTIVE
+          elif(self._state == wishboneStandardState.ACTIVE):
             if(self.wqueue.empty() and self.bus.ack.value):
               self.bus.stb.value = 0
               self.bus.sel.value = 0
@@ -143,7 +144,7 @@ class wishboneClassicMaster(wishboneClassicBase):
               self.bus.cyc.value = 0
               self._idle.set()
               self.active = False
-              self._state = wishboneClassicState.IDLE
+              self._state = wishboneStandardState.IDLE
             elif(self.bus.ack.value):
               trans = await self.wqueue.get()
               self.bus.sel.value = ~0
@@ -153,7 +154,7 @@ class wishboneClassicMaster(wishboneClassicBase):
               self.bus.stb.value = 1
               self.bus.cyc.value = 1
               self._idle.set()
-              self.log.info(f'WISHBONE CLASSIC MASTER STATE: {self._state.name} BUS WRITE')
+              self.log.info(f'WISHBONE STANDARD MASTER STATE: {self._state.name} BUS WRITE')
 
           #all operations are done on rising edge of clock
           await RisingEdge(self.clock)
@@ -163,7 +164,7 @@ class wishboneClassicMaster(wishboneClassicBase):
         self.active = True
         #keep in active loop
         while self.active:
-          if(self._state == wishboneClassicState.IDLE):
+          if(self._state == wishboneStandardState.IDLE):
             trans = await self.qqueue.get()
             self.bus.sel.value = ~0
             self.bus.addr.value = trans.address
@@ -171,10 +172,10 @@ class wishboneClassicMaster(wishboneClassicBase):
             self.bus.stb.value = 1
             self.bus.cyc.value = 1
             self._idle.set()
-            self.log.info(f'WISHBONE CLASSIC MASTER STATE: {self._state.name} BUS READ')
-            self._state = wishboneClassicState.ACTIVE
-          elif(self._state == wishboneClassicState.ACTIVE):
-            # queue is empty and we are ready, time to go to idle.
+            self.log.info(f'WISHBONE STANDARD MASTER STATE: {self._state.name} BUS READ')
+            self._state = wishboneStandardState.ACTIVE
+          elif(self._state == wishboneStandardState.ACTIVE):
+            # queue is empty and we are ready, time to go to idle.wishboneClassic
             if(self.qqueue.empty() and self.bus.ack.value):
               trans.data = self.bus.data_o.value
               await self.rqueue.put(trans)
@@ -182,7 +183,7 @@ class wishboneClassicMaster(wishboneClassicBase):
               self.bus.stb.value = 0
               self.bus.cyc.value = 0
               self.bus.addr.value = 0
-              self._state = wishboneClassicState.IDLE
+              self._state = wishboneStandardState.IDLE
               self.active = False
               self._idle.set()
             # acked and not empty, lets idle the active thread.
@@ -196,7 +197,7 @@ class wishboneClassicMaster(wishboneClassicBase):
               trans.data = self.bus.data_o.value
               await self.rqueue.put(trans)
               self._idle.set()
-              self.log.info(f'WISHBONE CLASSIC MASTER STATE: {self._state.name} BUS READ')
+              self.log.info(f'WISHBONE STANDARD MASTER STATE: {self._state.name} BUS READ')
 
           # all operations happen on positive edge
           await RisingEdge(self.clock)
@@ -214,9 +215,9 @@ class wishboneClassicMaster(wishboneClassicBase):
 
 
 
-# Class: wishboneClassicEchoSlave
+# Class: wishboneStandardEchoSlave
 # Respond to master reads and write by returning data, simple echo core.
-class wishboneClassicEchoSlave(wishboneClassicBase):
+class wishboneStandardEchoSlave(wishboneStandardBase):
   # Constructor: __init__
   # Setup defaults and call base class constructor.
   def __init__(self, entity, name, clock, reset, numreg=256, *args, **kwargs):
@@ -236,10 +237,10 @@ class wishboneClassicEchoSlave(wishboneClassicBase):
       self._registers[i] = 0
 
   # Function: _check_type
-  # Check and make sure we are only sending a type of wishboneClassicTrans.
+  # Check and make sure we are only sending a type of wishboneStandardTrans.
   def _check_type(self, trans):
-      if(not isinstance(trans, wishboneClassicTrans)):
-          self.log.error(f'Transaction must be of type: {type(wishboneClassicTrans)}')
+      if(not isinstance(trans, wishboneStandardTrans)):
+          self.log.error(f'Transaction must be of type: {type(wishboneStandardTrans)}')
           return False
 
       return True
@@ -256,7 +257,7 @@ class wishboneClassicEchoSlave(wishboneClassicBase):
         self.active = True
         previous_state = self._state
         while self.active:
-          if(self._state == wishboneClassicState.IDLE):
+          if(self._state == wishboneStandardState.IDLE):
             if(self.bus.cyc.value and self.bus.stb.value):
               self.bus.err.value = 0
               self.bus.ack.value = 1
@@ -266,20 +267,20 @@ class wishboneClassicEchoSlave(wishboneClassicBase):
                 self.bus.data_o.value = self._registers[self.bus.addr.value.integer]
 
               self._idle.set()
-              self._state = wishboneClassicState.ACTIVE
+              self._state = wishboneStandardState.ACTIVE
             elif(not self.bus.cyc.value):
               self.active = False
-          elif(self._state == wishboneClassicState.ACTIVE):
+          elif(self._state == wishboneStandardState.ACTIVE):
             if(not self.bus.cyc.value):
               self.active = False
 
             if(self.bus.cyc.value and self.bus.stb.value):
               self.bus.ack.value = 0
-              self._state = wishboneClassicState.IDLE
+              self._state = wishboneStandardState.IDLE
               self._idle.set()
 
           if(previous_state != self._state):
-            self.log.info(f'WISHBONE ECHO SLAVE STATE: {self._state.name}')
+            self.log.info(f'WISHBONE STANDARD ECHO SLAVE STATE: {self._state.name}')
 
           previous_state = self._state
 
@@ -287,7 +288,7 @@ class wishboneClassicEchoSlave(wishboneClassicBase):
       else:
         self._idle.set()
 
-        self._state = wishboneClassicState.IDLE
+        self._state = wishboneStandardState.IDLE
 
         self.bus.ack.value = 0
         self.bus.err.value = 0

@@ -1,7 +1,7 @@
 \begin{titlepage}
   \begin{center}
 
-  {\Huge cocotbext Wishbone Classic}
+  {\Huge cocotbext Wishbone}
 
   \vspace{25mm}
 
@@ -28,7 +28,7 @@
 
 \par
 Cocotb extension to test Wishbone Classic Standard bus master, and slave devices.
-This currently only tests for devices that are not pipelined or using cti/bte. Also no tags.
+This currently only tests for devices that are not pipelined or using cti/bte (registered). Also no tags.
 
 \subsection{Dependencies}
 
@@ -46,8 +46,8 @@ The following are the dependencies of the cores.
 Below is a simple example for reading and writing data from register zero in the cocotb extension.
 \begin{lstlisting}[language=Python]
 
-master  = wishboneClassicMaster(dut, "s_wb", dut.clk, dut.rst)
-slave = wishboneClassicEchoSlave(dut, "s_wb", dut.clk, dut.rst)
+master  = wishboneStandardMaster(dut, "s_wb", dut.clk, dut.rst)
+slave = wishboneStandardEchoSlave(dut, "s_wb", dut.clk, dut.rst)
 
 await master.write(0, 0xAAAAAAAA)
 
@@ -62,11 +62,11 @@ assert 0xAAAAAAAA == rx_data, "RECEIVED DATA DOES NOT MATCH"
 Please see \ref{Code Documentation} for more information.
 
 \par
-wishboneClassicMaster tests Wishbone Classic slave devices by executing read/write requests from the python test bench.
+wishboneStandardMaster tests Wishbone Classic slave devices by executing read/write requests from the python test bench.
 \par
-wishboneClassicEchoSlave provides a simple slave that will echo all register writes back over read when requested.
+wishboneStandardEchoSlave provides a simple slave that will echo all register writes back over read when requested.
 \par
-wishboneClassicMonitor tests to make sure signals are proper. Simple core at the moment, only checks for if stb is
+wishboneStandardMonitor tests to make sure signals are proper. Simple core at the moment, only checks for if stb is
 asserted when cyc is not.
 
 \subsection{Directory Guide}
@@ -81,7 +81,7 @@ Below highlights important folders from the root of the directory.
     \end{itemize}
   \item \textbf{cocotbext} Contains source files for the extension
     \begin{itemize}
-      \item \textbf{wishbone.classic} Contains source files for the Wishbone version B4 classic extension.
+      \item \textbf{wishbone.standard} Contains source files for the Wishbone version B4 classic standard extension.
     \end{itemize}
   \item \textbf{tests} Contains test files for cocotb
 \end{enumerate}

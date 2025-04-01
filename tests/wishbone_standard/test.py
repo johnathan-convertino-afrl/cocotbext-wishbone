@@ -69,11 +69,11 @@ from cocotb.regression import TestFactory
 
 
 try:
-    from cocotbext.wishbone.classic import wishboneClassicMaster, wishboneClassicEchoSlave, wishboneClassicMonitor
+    from cocotbext.wishbone.standard import wishboneStandardMaster, wishboneStandardEchoSlave, wishboneStandardMonitor
 except ImportError as e:
     import sys
     sys.path.append("../../")
-    from cocotbext.wishbone.classic import wishboneClassicMaster, wishboneClassicEchoSlave, wishboneClassicMonitor
+    from cocotbext.wishbone.standard import wishboneStandardMaster, wishboneStandardEchoSlave, wishboneStandardMonitor
 
 # Class: TB
 # Create the device under test which is the master/slave.
@@ -86,9 +86,9 @@ class TB:
 
         cocotb.start_soon(Clock(dut.clk, 2, units="ns").start())
 
-        self.master  = wishboneClassicMaster(dut, "s_wb", dut.clk, dut.rst)
-        self.slave = wishboneClassicEchoSlave(dut, "s_wb", dut.clk, dut.rst)
-        self.monitor = wishboneClassicMonitor(dut, "s_wb", dut.clk, dut.rst)
+        self.master  = wishboneStandardMaster(dut, "s_wb", dut.clk, dut.rst)
+        self.slave = wishboneStandardEchoSlave(dut, "s_wb", dut.clk, dut.rst)
+        self.monitor = wishboneStandardMonitor(dut, "s_wb", dut.clk, dut.rst)
 
     async def reset(self):
         self.dut.rst.setimmediatevalue(1)

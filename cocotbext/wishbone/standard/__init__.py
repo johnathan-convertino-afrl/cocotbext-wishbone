@@ -6,7 +6,7 @@
 # date:    2025/03/31
 #
 # about:   Brief
-# Wishbone Classic define for packages
+# Wishbone Classic Standard define for packages
 #
 # license: License MIT
 # Copyright 2025 Jay Convertino
@@ -56,6 +56,6 @@
 
 from ..version import __version__
 
-from .driver import wishboneClassicMaster, wishboneClassicEchoSlave
+from .driver import wishboneStandardMaster, wishboneStandardEchoSlave
 
-from .monitor import wishboneClassicMonitor
+from .monitor import wishboneStandardMonitor

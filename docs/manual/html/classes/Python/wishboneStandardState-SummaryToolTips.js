@@ -1,0 +1,1 @@
+﻿NDSummary.OnToolTipsLoaded("PythonClass:wishboneStandardState",{100:"<div class=\"NDToolTip TClass LPython\"><div class=\"NDClassPrototype\" id=\"NDClassPrototype100\"><div class=\"CPEntry TClass Current\"><div class=\"CPName\">wishboneStandardState</div></div></div><div class=\"TTSummary\">An enum class that provides the current operation state.</div></div>"});

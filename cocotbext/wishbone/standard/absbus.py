@@ -6,7 +6,7 @@
 # date:    2025/03/11
 #
 # about:   Brief
-# abstraction of the wishbone classic bus
+# abstraction of the wishbone classic standard bus
 #
 # license: License MIT
 # Copyright 2025 Jay Convertino
@@ -37,23 +37,23 @@ from ..busbase import *
 
 import enum
 
-# Class: wishboneClassicState
+# Class: wishboneStandardState
 # An enum class that provides the current operation state.
-class wishboneClassicState(enum.IntEnum):
+class wishboneStandardState(enum.IntEnum):
   IDLE   = 1
   ACTIVE = 2
   ERROR  = 99
 
-# Class: wishboneClassicTrans
+# Class: wishboneStandardTrans
 # Create an object that associates data, address
-class wishboneClassicTrans(transaction):
+class wishboneStandardTrans(transaction):
     def __init__(self, address, data=None):
         self.address = address
         self.data = data
 
-# Class: wishboneClassicBase
+# Class: wishboneStandardBase
 # abstract base class that defines Wishbone Classic signals
-class wishboneClassicBase(busbase):
+class wishboneStandardBase(busbase):
   # Variable: _signals
   # List of signals that are required
   _signals = ["data_o", "data_i", "addr", "ack", "sel", "we", "stb", "cyc"]
@@ -67,7 +67,7 @@ class wishboneClassicBase(busbase):
 
     super().__init__(entity, name, clock, *args, **kwargs)
 
-    self._state = wishboneClassicState.IDLE
+    self._state = wishboneStandardState.IDLE
 
     self._reset = reset
 

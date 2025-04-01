@@ -80,11 +80,11 @@ Home Page: ../html/other/html.html
 # Source Code
 # ------------------------------------------------------------------------
 
-Source Folder: ../../../cocotbext/wishbone/classic
-   Name: cocotbext-wishbone-classic
+Source Folder: ../../../cocotbext/wishbone/standard
+   Name: cocotbext-wishbone-standard
 
-Source Folder 2: ../../../tests/wishbone_classic
-   Name: cocotbext-wishbone-classic-tests
+Source Folder 2: ../../../tests/wishbone_standard
+   Name: cocotbext-wishbone-standard-tests
 
 Source Folder 3: ../../../cocotbext/wishbone
    Name: cocotbext-wishbone

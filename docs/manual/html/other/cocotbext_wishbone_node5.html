@@ -52,8 +52,8 @@ Below is a simple example for reading and writing data from register zero in the
 <TABLE FRAME="VOID" CELLPADDING="4"><TR><TD>
 <PRE>
 
-master  = wishboneClassicMaster(dut, "s_wb", dut.clk, dut.rst)
-slave = wishboneClassicEchoSlave(dut, "s_wb", dut.clk, dut.rst)
+master  = wishboneStandardMaster(dut, "s_wb", dut.clk, dut.rst)
+slave = wishboneStandardEchoSlave(dut, "s_wb", dut.clk, dut.rst)
 
 await master.write(0, 0xAAAAAAAA)
 
