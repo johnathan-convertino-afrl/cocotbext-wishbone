@@ -167,8 +167,6 @@ class busbase:
         else:
             await self._write(trans)
 
-        self._idle.clear()
-
     # Function: read_trans
     # Read bus and output and tranaction.
     async def read_trans(self, trans : transaction):
@@ -196,7 +194,6 @@ class busbase:
     async def _queue_read(self, trans : transaction):
         if(self._check_type(trans)):
             await self.qqueue.put(trans)
-            await self._idle.wait()
 
     # Function: _read
     # Read dat one element at a time

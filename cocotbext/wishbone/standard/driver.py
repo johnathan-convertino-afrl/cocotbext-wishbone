@@ -187,14 +187,14 @@ class wishboneStandardMaster(wishboneStandardBase):
               self._idle.set()
             # acked and not empty, lets idle the active thread.
             elif(self.bus.ack.value):
+              trans.data = self.bus.data_o.value
+              await self.rqueue.put(trans)
               trans = await self.qqueue.get()
-              self.bus.sel.value = 0
+              self.bus.sel.value = ~0
               self.bus.we.value = 0
               self.bus.addr.value = trans.address
               self.bus.stb.value = 1
               self.bus.cyc.value = 1
-              trans.data = self.bus.data_o.value
-              await self.rqueue.put(trans)
               self._idle.set()
               self.log.info(f'WISHBONE STANDARD MASTER STATE: {self._state.name} BUS READ')
 
