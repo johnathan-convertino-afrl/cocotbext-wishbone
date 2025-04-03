@@ -113,7 +113,6 @@ class wishboneStandardMaster(wishboneStandardBase):
         self.bus.we.value = 0
         self.bus.stb.value = 0
         self.bus.cyc.value = 0
-        self._idle.set()
         continue
 
       # write queue is not empty, we need to write that data.
@@ -129,7 +128,6 @@ class wishboneStandardMaster(wishboneStandardBase):
             self.bus.we.value = 1
             self.bus.stb.value = 1
             self.bus.cyc.value = 1
-            self._idle.set()
             self.log.info(f'WISHBONE STANDARD MASTER STATE: {self._state.name} BUS WRITE')
             self._state = wishboneStandardState.ACTIVE
           elif(self._state == wishboneStandardState.ACTIVE):
@@ -203,8 +201,6 @@ class wishboneStandardMaster(wishboneStandardBase):
 
       else:
         # nothing in the queues, idle and set all values to zero
-        self._idle.set()
-
         self.bus.we.value = 0
         self.bus.addr.value = 0
         self.bus.data_i.value = 0

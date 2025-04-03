@@ -97,7 +97,7 @@ class busbase:
         # Variable: self._idle
         # Event trigger for cocotb
         self._idle = Event()
-        self._idle.set()
+        self._idle.clear()
 
         # Variable: self._run_cr
         # Thread instance of _run method
@@ -167,6 +167,7 @@ class busbase:
         else:
             await self._write(trans)
 
+
     # Function: read_trans
     # Read bus and output and tranaction.
     async def read_trans(self, trans : transaction):
@@ -187,6 +188,7 @@ class busbase:
     async def _write(self, trans : transaction):
         if(self._check_type(trans)):
             await self.wqueue.put(trans)
+            self._idle.clear()
             await self._idle.wait()
 
     # Function: _queue_read
