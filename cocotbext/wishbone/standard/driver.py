@@ -128,7 +128,6 @@ class wishboneStandardMaster(wishboneStandardBase):
             self.bus.we.value = 1
             self.bus.stb.value = 1
             self.bus.cyc.value = 1
-            self.log.info(f'WISHBONE STANDARD MASTER STATE: {self._state.name} BUS WRITE')
             self._state = wishboneStandardState.ACTIVE
           elif(self._state == wishboneStandardState.ACTIVE):
             if(self.wqueue.empty() and self.bus.ack.value):
@@ -139,7 +138,7 @@ class wishboneStandardMaster(wishboneStandardBase):
               self.bus.we.value = 0
               self.bus.stb.value = 0
               self.bus.cyc.value = 0
-              self._idle.set()
+              self._idle_write.set()
               self.active = False
               self._state = wishboneStandardState.IDLE
             elif(self.bus.ack.value):
@@ -150,8 +149,7 @@ class wishboneStandardMaster(wishboneStandardBase):
               self.bus.we.value = 1
               self.bus.stb.value = 1
               self.bus.cyc.value = 1
-              self._idle.set()
-              self.log.info(f'WISHBONE STANDARD MASTER STATE: {self._state.name} BUS WRITE')
+              self._idle_write.set()
 
           #all operations are done on rising edge of clock
           await RisingEdge(self.clock)
@@ -168,8 +166,7 @@ class wishboneStandardMaster(wishboneStandardBase):
             self.bus.we.value = 0
             self.bus.stb.value = 1
             self.bus.cyc.value = 1
-            self._idle.set()
-            self.log.info(f'WISHBONE STANDARD MASTER STATE: {self._state.name} BUS READ')
+            self._idle_read.set()
             self._state = wishboneStandardState.ACTIVE
           elif(self._state == wishboneStandardState.ACTIVE):
             # queue is empty and we are ready, time to go to idle.wishboneClassic
@@ -182,7 +179,7 @@ class wishboneStandardMaster(wishboneStandardBase):
               self.bus.addr.value = 0
               self._state = wishboneStandardState.IDLE
               self.active = False
-              self._idle.set()
+              self._idle_read.set()
             # acked and not empty, lets idle the active thread.
             elif(self.bus.ack.value):
               trans.data = self.bus.data_o.value
@@ -193,8 +190,7 @@ class wishboneStandardMaster(wishboneStandardBase):
               self.bus.addr.value = trans.address
               self.bus.stb.value = 1
               self.bus.cyc.value = 1
-              self._idle.set()
-              self.log.info(f'WISHBONE STANDARD MASTER STATE: {self._state.name} BUS READ')
+              self._idle_read.set()
 
           # all operations happen on positive edge
           await RisingEdge(self.clock)
@@ -250,7 +246,6 @@ class wishboneStandardEchoSlave(wishboneStandardBase):
 
       if not self._reset.value:
         self.active = True
-        previous_state = self._state
         while self.active:
           if(self._state == wishboneStandardState.IDLE):
             if(self.bus.cyc.value and self.bus.stb.value):
@@ -258,10 +253,11 @@ class wishboneStandardEchoSlave(wishboneStandardBase):
               self.bus.ack.value = 1
               if(self.bus.we.value):
                 self._registers[self.bus.addr.value.integer] = self.bus.data_i.value
+                self._idle_write.set()
               else:
                 self.bus.data_o.value = self._registers[self.bus.addr.value.integer]
+                self._idle_read.set()
 
-              self._idle.set()
               self._state = wishboneStandardState.ACTIVE
             elif(not self.bus.cyc.value):
               self.active = False
@@ -270,18 +266,16 @@ class wishboneStandardEchoSlave(wishboneStandardBase):
               self.active = False
 
             if(self.bus.cyc.value and self.bus.stb.value):
+              self.active = True
               self.bus.ack.value = 0
               self._state = wishboneStandardState.IDLE
-              self._idle.set()
-
-          if(previous_state != self._state):
-            self.log.info(f'WISHBONE STANDARD ECHO SLAVE STATE: {self._state.name}')
-
-          previous_state = self._state
+              if(self.bus.we.value):
+                self._idle_write.set()
+              else:
+                self._idle_read.set()
 
           await RisingEdge(self.clock)
       else:
-        self._idle.set()
 
         self._state = wishboneStandardState.IDLE
 

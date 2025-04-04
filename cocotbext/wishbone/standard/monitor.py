@@ -72,12 +72,12 @@ class wishboneStandardMonitor(wishboneStandardBase):
       if self._reset.value:
         assert self.bus.stb.value == 0,   "RESET ISSUE: STB is not zero."
         assert self.bus.cyc.value == 0,   "RESET ISSUE: CYC is not zero."
-
-        self._idle.set()
         continue
 
       # simple check for now.
       if self.bus.stb.value:
+        self._idle_read.set()
+        self._idle_write.set()
         if not self.bus.cyc.value:
           raise ValueError("CYC ISSUE: CYC is not zero when STB is one.")
 
